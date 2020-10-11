@@ -13,6 +13,22 @@ var anim
 var new_anim
 var velocity = Vector2()
 
+signal life_changed
+signal dead
+
+var life
+
+func start(pos):
+	life = 3
+	emit_signal('life_changed', life)
+	position = pos
+	show()
+	change_state(IDLE)
+	
+func hurt():
+	if state != HURT:
+		change_state(HURT)
+
 func get_input():
 	if state == HURT:
 		return # Return nothing, don't allow movement when hurt
@@ -41,6 +57,10 @@ func get_input():
 	# transistions to JUMP when falling off edge
 	if state in [IDLE, RUN] and !is_on_floor():
 		change_state(JUMP)
+	if state == JUMP and is_on_floor():
+		change_state(IDLE)
+	if state == JUMP and velocity.y > 0:
+		new_anim = 'Jump_Down'
 		
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -50,22 +70,35 @@ func change_state(new_state):
 	state = new_state
 	match state:
 		IDLE:
-			new_anim = 'Idle'
+			new_anim = 'idle'
 		RUN:
 			new_anim = 'Run'
 		HURT:
 			new_anim = "Hurt"
+			velocity.y = -200
+			velocity.x = -100 * sign(velocity.x)
+			life -= 1
+			emit_signal('life_changed', life)
+			yield(get_tree().create_timer(0.5), 'timeout')
+			change_state(IDLE)
+			if life < 0:
+				change_state(DEAD)
 		JUMP:
 			new_anim = "Jump_Up"
 		DEAD:
+			emit_signal('dead')
 			hide()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
+	
 	velocity.y += gravity * delta
+	
 	get_input()
+	
 	if new_anim != anim:
 		anim = new_anim
 		$AnimationPlayer.play(anim)
 	# move the player
+	
 	velocity = move_and_slide(velocity, Vector2(0, -1))	
