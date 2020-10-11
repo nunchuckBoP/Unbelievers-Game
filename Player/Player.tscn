@@ -89,6 +89,9 @@ tracks/0/keys = {
 
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
 run_speed = 150
 jump_speed = -300
 gravity = 750
@@ -97,7 +100,7 @@ gravity = 750
 position = Vector2( -1.59099, 4.59621 )
 texture = ExtResource( 1 )
 hframes = 19
-frame = 7
+frame = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -2.2981, 9.54594 )

@@ -35,7 +35,8 @@ func get_input():
 	var right = Input.is_action_pressed('right')
 	var left = Input.is_action_pressed('left')
 	var jump = Input.is_action_pressed('jump')
-	
+	var jump_released = Input.is_action_just_released('jump')
+		
 	# movement occurs in all states
 	velocity.x = 0
 	if right:
@@ -59,6 +60,8 @@ func get_input():
 		change_state(JUMP)
 	if state == JUMP and is_on_floor():
 		change_state(IDLE)
+	if state == JUMP and jump_released and velocity.y < 0:
+		velocity.y = 0
 	if state == JUMP and velocity.y > 0:
 		new_anim = 'Jump_Down'
 		
